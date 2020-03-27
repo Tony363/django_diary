@@ -1,15 +1,15 @@
-from django.shortcuts import render,redirect
-from django.http import HttpResponse
-from django.views.generic.list import ListView 
-from django.urls import reverse_lazy,reverse
+from django.shortcuts import render,redirect, get_object_or_404
+from django.http import HttpResponse,HttpResponseRedirect
 from django.views import generic
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from .forms import *
+from .forms import EventForm
 from .models import *
 from .utils import Calendar
+from calendar import monthrange
+from datetime import datetime,timedelta,date
 
-from datetime import datetime
 
 # Create your views here.
 
@@ -25,7 +25,7 @@ def Enter_Question(request):
         form.save()
         return redirect('index')
     else:
-        form = Enter_Question()
+        form = Enter_Question(None)
         return render(request,'questions.html',{'form':form})
 
 class CalendarView(generic.ListView):
@@ -38,6 +38,8 @@ class CalendarView(generic.ListView):
         cal = Calendar(d.year,d.month)
         html_cal = cal.formatmonth(withyear=True)
         context['calendar'] = mark_safe(html_cal)
+        context['prev_month'] = prev_month(d)
+        # context['next_month'] = next_month(d)
         return context
 
 def get_date(req_day):
@@ -46,4 +48,28 @@ def get_date(req_day):
         return date(year,month,day=1)
     return datetime.today()
 
+def prev_month(d):
+    first = d.replace(day=1)
+    prev_month = first - timedelta(days=1)
+    month = 'month='+str(prev_month.year)+'-'+str(prev_month.month)
+    return month
 
+def next_month(d):
+    days_in_month = monthrange(d.year,d.month)[1]
+    last = d.replace(day=days_in_month)
+    next_month = last + timedelta(days=1)
+    month = 'month='+str(next_month.year)+'-'+str(next_month.month)
+    return month
+
+def event(request,event_id=None):
+    instance = Event()
+    if event_id:
+        instance = get_object_or_404(Event,pk=event_id)
+    else:
+        instance = Event()
+    
+    form = EventForm(request.POST or None, instance=instance)
+    if request.POST and form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse('diary:calendar'))
+    return render(request,'diary/event.html',{'form':form})

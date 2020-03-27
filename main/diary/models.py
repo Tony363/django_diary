@@ -21,4 +21,11 @@ class Event(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
+    @property
+    def get_html_url(self):
+        url = reverse('diary:event_edit',args=(self.id,))
+        return f'<a href="{url}">{self.title}</a>'
+
+
+
     
