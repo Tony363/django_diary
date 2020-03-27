@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRETS = SECRETS
+SECRET_KEY = SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'diary',
     'crispy_forms',
+    'event_rsvp',
+    'mptt',
+    'filer',
+    'easy_thumbnails',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +72,10 @@ TEMPLATES = [
         },
     },
 ]
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.template.context_processors.request'
+)
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
@@ -120,4 +128,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CALENDARIUM_SHIFT_WEEKSTART=-1
 
