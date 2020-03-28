@@ -4,7 +4,7 @@ from django.views import generic
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from .forms import EventForm
+from .forms import EventForm, Enter_Question
 from .models import *
 from .utils import Calendar
 from calendar import monthrange
@@ -16,21 +16,22 @@ from datetime import datetime,timedelta,date
 def index(request):
     return HttpResponse('work already')
 
-def Enter_Question(request):
+def question_enter(request):
   
-    if request.method == 'POST':
+    if request.POST:
         form = Enter_Question(request.POST)
-    
-        question = form.cleaned_data['Question']
-        form.save()
-        return redirect('index')
+        if form.is_valid():
+            Question = form.cleaned_data['Question']
+            form.save()
+            return redirect('/')
     else:
-        form = Enter_Question(None)
+        form = Enter_Question()
         return render(request,'questions.html',{'form':form})
 
 class CalendarView(generic.ListView):
     model = Event
     template_name = 'diary/calendar.html'
+    print(Event.title)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -62,6 +63,10 @@ def next_month(d):
     return month
 
 def event(request,event_id=None):
+    question = Question.objects.all()
+    random_items = random.choice(question)
+    print(type(random_items))
+
     instance = Event()
     if event_id:
         instance = get_object_or_404(Event,pk=event_id)
@@ -69,7 +74,9 @@ def event(request,event_id=None):
         instance = Event()
     
     form = EventForm(request.POST or None, instance=instance)
+
     if request.POST and form.is_valid():
         form.save()
+        question.save()
         return HttpResponseRedirect(reverse('diary:calendar'))
-    return render(request,'diary/event.html',{'form':form})
+    return render(request,'diary/event.html',{'form':form,"question":str(question)})
