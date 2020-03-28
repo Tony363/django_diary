@@ -63,9 +63,9 @@ def next_month(d):
     return month
 
 def event(request,event_id=None):
-    question = Question.objects.all()
-    random_items = random.choice(question)
-    print(type(random_items))
+    question = Question.objects.order_by('?')[0]
+    # random_items = random.choice(question)
+    
 
     instance = Event()
     if event_id:
