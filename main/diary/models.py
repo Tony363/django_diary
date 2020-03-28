@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+import datetime as dt
 
 # Create your models here.
 class Question(models.Model):
@@ -18,8 +19,8 @@ class Question(models.Model):
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    start_time = models.DateTimeField(auto_now=dt.datetime.now())
+    end_time = models.DateTimeField(auto_now=dt.datetime.now() + dt.timedelta(days=1))
 
     @property
     def get_html_url(self):
